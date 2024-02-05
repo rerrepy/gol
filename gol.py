@@ -2,6 +2,15 @@
 def initialize_grid(width, height):
     return [[0 for _ in range(width)] for _ in range(height)]
 
+def initialize_alive_cells(grid):
+    """Initialize the set of alive cells based on the current grid."""
+    return {(x, y) for y in range(len(grid)) for x in range(len(grid[0])) if grid[y][x] == 1}
+
+
+def get_neighbors(x, y):
+    """Generate all neighbor positions of a given cell."""
+    return [(x + dx, y + dy) for dx in range(-1, 2) for dy in range(-1, 2) if not (dx == 0 and dy == 0)]
+
 def update_grid(grid, x_cells, y_cells):
     new_grid = [[0 for _ in range(len(grid[0]))] for _ in range(len(grid))]
     # Add logic to update the grid based on GoL rules

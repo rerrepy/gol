@@ -90,12 +90,13 @@ pygame.display.set_caption('Gol')
 
 # Button setup
 font = pygame.font.Font(None, 36)
-pause_button = pygame.Rect(GRID_WIDTH + 30, 10, 140, 50)
-speed_button = pygame.Rect(GRID_WIDTH + 30, 70, 140, 50)
+pause_button = pygame.Rect(GRID_WIDTH + 30, 10, 160, 50)
+speed_button = pygame.Rect(GRID_WIDTH + 30, 70, 160, 50)
+slow_button = pygame.Rect(GRID_WIDTH + 30, 130, 160, 50)
 # Add a button for the "glider gun"
-glider_gun_button = pygame.Rect(GRID_WIDTH + 30, 130, 140, 50)
+glider_gun_button = pygame.Rect(GRID_WIDTH + 30, 190, 160, 50)
 
-clear_button = pygame.Rect(GRID_WIDTH + 30, 190, 140, 50)
+clear_button = pygame.Rect(GRID_WIDTH + 30, 250, 160, 50)
 
 # Add a flag to determine if we are in "glider gun" placement mode
 placing_glider_gun = False
@@ -105,6 +106,11 @@ running = True
 paused = False
 speed = 0.1  # Speed of simulation
 
+# Initialize Clock for FPS tracking
+clock = pygame.time.Clock()
+
+# Initialize font for FPS counter
+fps_font = pygame.font.Font(None, 24)  # Smaller font for FPS
 
 # Main game loop
 running = True
@@ -121,7 +127,8 @@ while running:
             elif speed_button.collidepoint(mouse_x, mouse_y):
                 speed = max(0.01, speed - 0.05)  # Decrease delay to speed up
             # Toggle cell state on click
-                
+            elif slow_button.collidepoint(mouse_x, mouse_y):
+                speed = max(0.01, speed + 0.05)
                        # Check for glider gun button click
             elif glider_gun_button.collidepoint(mouse_x, mouse_y):
                 placing_glider_gun = not placing_glider_gun  # Toggle placement mode
@@ -163,6 +170,10 @@ while running:
     pygame.draw.rect(screen, (100, 100, 100), speed_button)
     speed_text = font.render('Speed Up', True, (255, 255, 255))
     screen.blit(speed_text, (speed_button.x + 10, speed_button.y + 10))
+    
+    pygame.draw.rect(screen, (100, 100, 100), slow_button)
+    slow_text = font.render('Speed down', True, (255, 255, 255))
+    screen.blit(slow_text, (slow_button.x + 10, slow_button.y + 10))
 
     # Draw the "glider gun" button
     pygame.draw.rect(screen, (100, 100, 100), glider_gun_button)
@@ -188,6 +199,13 @@ while running:
         # Update grid if not paused
         grid = update_grid(grid, X_CELLS, Y_CELLS)
         sleep(speed)
+
+    # FPS Counter
+    fps = int(clock.get_fps())  # Get the current FPS
+    fps_text = fps_font.render(f'FPS: {fps}', True, (0, 0, 0))
+    fps_text_rect = fps_text.get_rect(bottomright=(TOTAL_WIDTH - 10, Y_RESOLUTION - 10))
+    screen.blit(fps_text, fps_text_rect)
+    clock.tick(300)
 
     # Update the display
     pygame.display.flip()
