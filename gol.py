@@ -11,24 +11,33 @@ def get_neighbors(x, y):
     """Generate all neighbor positions of a given cell."""
     return [(x + dx, y + dy) for dx in range(-1, 2) for dy in range(-1, 2) if not (dx == 0 and dy == 0)]
 
-def update_grid(grid, x_cells, y_cells):
-    new_grid = [[0 for _ in range(len(grid[0]))] for _ in range(len(grid))]
-    # Add logic to update the grid based on GoL rules
-    # For now, this is just a placeholder
-    for y in range(len(grid)):
-        for x in range(len(grid[0])):
-            current_neighbours = check_neighbours(grid, x, y, x_cells, y_cells)
-            if grid[y][x] == 1:
-                if current_neighbours < 2:
-                    new_grid[y][x] = 0
-                elif current_neighbours > 3:
-                    new_grid[y][x] = 0
-                else:
-                    new_grid[y][x] = 1
-            else:
-                if current_neighbours == 3:
-                    new_grid[y][x] = 1
-    return new_grid
+def update_grid(grid, alive_cells, x_cells, y_cells):
+    new_alive_cells = set()
+    potential_cells = set()
+
+    # Find all potential cells to update (alive cells and their neighbors)
+    for cell in alive_cells:
+        potential_cells.add(cell)
+        potential_cells.update(get_neighbors(*cell))
+
+    # Filter potential cells to those within bounds
+    potential_cells = {cell for cell in potential_cells if not oob(cell[0], cell[1], x_cells, y_cells)}
+
+    new_grid = [[0 for _ in range(x_cells)] for _ in range(y_cells)]
+
+    for cell in potential_cells:
+        x, y = cell
+        current_neighbours = check_neighbours(grid, x, y, x_cells, y_cells)
+        if grid[y][x] == 1 and 2 <= current_neighbours <= 3:
+            new_alive_cells.add((x, y))
+            new_grid[y][x] = 1
+        elif grid[y][x] == 0 and current_neighbours == 3:
+            new_alive_cells.add((x, y))
+            new_grid[y][x] = 1
+    
+    
+
+    return new_grid, new_alive_cells
 
 def check_neighbours(grid, cell_x, cell_y, x_cells, y_cells):
     num_alive_neighbours = 0
@@ -38,11 +47,8 @@ def check_neighbours(grid, cell_x, cell_y, x_cells, y_cells):
             neighbor_y = cell_y + y_offset
             if not oob(neighbor_x, neighbor_y, x_cells, y_cells):
                 if not (x_offset == 0 and y_offset == 0):
-                    #if grid[cell_y][cell_x] == 1:
-                        #print(f'Comparing cell at {cell_x}, {cell_y} with {neighbor_x} and {neighbor_y}')
                     if grid[neighbor_y][neighbor_x] == 1:
                         num_alive_neighbours += 1
-    #print(num_alive_neighbours)
     return num_alive_neighbours
 
 

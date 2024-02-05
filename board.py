@@ -1,22 +1,23 @@
 import pygame
 import sys
 from time import sleep
-from gol import initialize_grid, update_grid
+from gol import initialize_grid, update_grid, initialize_alive_cells
 
 pygame.init()
 
 # Screen setup
-GRID_WIDTH = 800
-GRID_HEIGHT = 600
+GRID_WIDTH = 1600
+GRID_HEIGHT = 1200
 CONTROL_WIDTH = 200  # Width of the control panel
 TOTAL_WIDTH = GRID_WIDTH + CONTROL_WIDTH  # Total screen width
 Y_RESOLUTION = GRID_HEIGHT
-X_CELLS = 40
-Y_CELLS = 30
+X_CELLS = 160
+Y_CELLS = 120
 CELL_WIDTH = GRID_WIDTH // X_CELLS
 CELL_HEIGHT = Y_RESOLUTION // Y_CELLS
 
 grid = initialize_grid(X_CELLS, Y_CELLS)
+
 #grid = [[0 for _ in range(X_CELLS)] for _ in range(Y_CELLS)]
 
 grid[0][1] = 1
@@ -24,6 +25,7 @@ grid[1][2] = 1
 grid[2][0] = 1
 grid[2][1] = 1
 grid[2][2] = 1
+alive_cells = initialize_alive_cells(grid)
 
 
 def place_glider_gun(grid, top_left_x, top_left_y):
@@ -138,6 +140,7 @@ while running:
                 cell_x = mouse_x // CELL_WIDTH
                 cell_y = mouse_y // CELL_HEIGHT
                 place_glider_gun(grid, cell_x, cell_y)
+                alive_cells = initialize_alive_cells(grid)
                 placing_glider_gun = False  # Exit placement mode after placing
             elif clear_button.collidepoint(mouse_x, mouse_y):
                 grid = initialize_grid(X_CELLS, Y_CELLS)
@@ -150,11 +153,11 @@ while running:
     # Fill the screen with a background color
     screen.fill((255, 255, 255))
     # Draw the cells
-    for x in range(X_CELLS):
-        for y in range(Y_CELLS):
-            rect = pygame.Rect(x*CELL_WIDTH, y*CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT)
-            if grid[y][x] == 1:  # Fill cell if active
-                pygame.draw.rect(screen, (0, 0, 0), rect)
+    # Use alive_cells directly:
+    for cell in alive_cells:
+        x, y = cell
+        rect = pygame.Rect(x*CELL_WIDTH, y*CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT)
+        pygame.draw.rect(screen, (0, 0, 0), rect)
 
     # Draw the grid lines after filling cells to ensure they remain visible
     for x in range(X_CELLS + 1):
@@ -195,9 +198,11 @@ while running:
             rect = pygame.Rect(hover_x, hover_y, CELL_WIDTH * 38, CELL_HEIGHT * 11)
             #pygame.draw.rect(screen, (255, 255, 0, 128), rect, 1)  # Semi-transparent
 
+    
+
     if not paused:
         # Update grid if not paused
-        grid = update_grid(grid, X_CELLS, Y_CELLS)
+        grid, alive_cells = update_grid(grid, alive_cells, X_CELLS, Y_CELLS)
         sleep(speed)
 
     # FPS Counter
