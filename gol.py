@@ -6,8 +6,8 @@ def update_grid(grid, x_cells, y_cells):
     new_grid = [[0 for _ in range(len(grid[0]))] for _ in range(len(grid))]
     # Add logic to update the grid based on GoL rules
     # For now, this is just a placeholder
-    for x in range(len(grid)):
-        for y in range(len(grid[0])):
+    for y in range(len(grid)):
+        for x in range(len(grid[0])):
             current_neighbours = check_neighbours(grid, x, y, x_cells, y_cells)
             if grid[y][x] == 1:
                 if current_neighbours < 2:
