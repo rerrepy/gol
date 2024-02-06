@@ -11,8 +11,8 @@ GRID_HEIGHT = 1200
 CONTROL_WIDTH = 200  # Width of the control panel
 TOTAL_WIDTH = GRID_WIDTH + CONTROL_WIDTH  # Total screen width
 Y_RESOLUTION = GRID_HEIGHT
-X_CELLS = 160
-Y_CELLS = 120
+X_CELLS = 400
+Y_CELLS = 300
 CELL_WIDTH = GRID_WIDTH // X_CELLS
 CELL_HEIGHT = Y_RESOLUTION // Y_CELLS
 
@@ -144,11 +144,13 @@ while running:
                 placing_glider_gun = False  # Exit placement mode after placing
             elif clear_button.collidepoint(mouse_x, mouse_y):
                 grid = initialize_grid(X_CELLS, Y_CELLS)
+                alive_cells = initialize_alive_cells(grid)
             else:
                 cell_x = mouse_x // CELL_WIDTH
                 cell_y = mouse_y // CELL_HEIGHT
                 if 0 <= cell_x < X_CELLS and 0 <= cell_y < Y_CELLS:
                     grid[cell_y][cell_x] = 1 - grid[cell_y][cell_x]  # Toggle state
+                    alive_cells = initialize_alive_cells(grid)
 
     # Fill the screen with a background color
     screen.fill((255, 255, 255))
